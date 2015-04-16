@@ -1,0 +1,334 @@
+create database 'localhost:C:/Users/Sony/Documents/Bd/Films.fdb'
+user 'SYSDBA' password 'masterkey'
+default character set win1251;
+commit;
+CREATE TABLE country
+(
+	c_id INT PRIMARY KEY,
+	name VARCHAR(80) NOT NULL UNIQUE
+);
+CREATE TABLE prokat
+(
+	pro_id INT PRIMARY KEY,
+	name VARCHAR(255),
+	money INT NOT NULL
+);
+CREATE TABLE man 
+(
+	man_id INT PRIMARY KEY,
+	name VARCHAR(80) NOT NULL,
+	surname VARCHAR(80) NOT NULL,
+	second_name VARCHAR(80),
+	birthday DATE NOT NULL,
+	sex CHAR CHECK (sex IN ('M','F')),
+	city VARCHAR(80) NOT NULL,
+	country INT NOT NULL REFERENCES country(c_id)	
+);
+
+CREATE TABLE career(
+	id INT PRIMARY KEY, 
+	name VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE genre(
+	id INT PRIMARY KEY,
+	name VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE money(
+	money_id INT PRIMARY KEY,
+	mon_man INT NOT NULL
+);
+	
+CREATE TABLE film 
+(
+	f_id INT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL, 
+	year_of_creation INT NOT NULL CHECK (year_of_creation >= 0),
+	duration INT NOT NULL CHECK (duration >= 0),
+	budget INT NOT NULL CHECK (budget >= 0),
+	prok INT REFERENCES prokat(pro_id)
+);
+
+CREATE TABLE prokat_company(
+	film_id INT NOT NULL REFERENCES film(f_id),
+	pro_id INT NOT NULL REFERENCES prokat(pro_id),
+	CONSTRAINT prokats PRIMARY KEY (film_id,pro_id)  
+);
+CREATE TABLE soundtrack
+(
+	sound_id INT PRIMARY KEY,
+	name VARCHAR(255), 
+	author INT NOT NULL REFERENCES man(man_id),
+	film INT NOT NULL REFERENCES film(f_id),
+	duration TIME 	
+);
+
+CREATE TABLE company
+(
+	com_id INT PRIMARY KEY,
+	name VARCHAR(255) NOT NULL,
+	year_of_foundation INT NOT NULL CHECK (year_of_foundation >= 0)
+);
+
+
+CREATE TABLE part
+(
+	film_id INT NOT NULL REFERENCES film(f_id),
+	man_id INT NOT NULL REFERENCES man(man_id),
+	role_id INT NOT NULL REFERENCES career(id),
+	CONSTRAINT role PRIMARY KEY (film_id,man_id,role_id)  
+);
+CREATE TABLE ganorar
+(
+	film_id INT NOT NULL REFERENCES film(f_id),
+	man_id INT  NOT NULL REFERENCES man(man_id),
+	money_id INT NOT NULL REFERENCES money(money_id),
+	CONSTRAINT monn PRIMARY KEY (film_id,man_id,money_id)  
+);	
+
+CREATE TABLE premium
+(
+	film_id INT NOT NULL REFERENCES film(f_id),
+	man_id INT REFERENCES man(man_id),
+	CONSTRAINT film_award PRIMARY KEY (film_id,man_id)  
+);
+
+CREATE TABLE made_in 
+(
+	film_id INT NOT NULL REFERENCES film(f_id),
+	country_id INT NOT NULL REFERENCES country(c_id),
+	CONSTRAINT film_country PRIMARY KEY (film_id,country_id) 
+);
+CREATE TABLE owner
+(
+	man_id INT NOT NULL REFERENCES man(man_id),
+	com_id INT NOT NULL REFERENCES company(com_id),
+	CONSTRAINT owner_company PRIMARY KEY (man_id,com_id)
+);
+CREATE TABLE production
+(
+	film_id INT NOT NULL REFERENCES film(f_id),
+	com_id INT NOT NULL REFERENCES company(com_id),
+	CONSTRAINT film_company PRIMARY KEY (film_id,com_id)	
+);
+CREATE TABLE style
+(
+	film_id INT NOT NULL REFERENCES film(f_id),
+	genre_id INT NOT NULL REFERENCES genre(id),
+	CONSTRAINT film_genre PRIMARY KEY (film_id,genre_id)
+);
+commit;
+
+
+INSERT INTO country VALUES (1,'Russia');
+INSERT INTO country VALUES (2,'USA');
+INSERT INTO country VALUES (3,'Germany');
+INSERT INTO country VALUES (4,'France');
+INSERT INTO country VALUES (5,'United Kingdom');
+INSERT INTO country VALUES (6,'Canada');
+INSERT INTO country VALUES (7,'New Zealand');
+INSERT INTO country VALUES (8,'Austria');
+
+INSERT INTO prokat VALUES(1,'mirash',20000000);
+INSERT INTO prokat VALUES(2,'Oazis',30000000);
+INSERT INTO prokat VALUES(3,'PIC',40000000);
+INSERT INTO prokat VALUES(4,'NewFilms',50000000);
+INSERT INTO prokat VALUES(5,'LikeCinima',60000000);
+commit;
+INSERT INTO money VALUES(1,20000000);
+INSERT INTO money VALUES(2,30000000);
+INSERT INTO money VALUES(3,40000000);
+INSERT INTO money VALUES(4,50000000);
+INSERT INTO money VALUES(5,60000000);
+
+INSERT INTO man (man_id,name,surname,birthday,sex,city,country)
+VALUES(1,'Steven','Spielberg','1946-12-18','M','Cincinnati',2);
+INSERT INTO man (man_id,name,surname,second_name,birthday,sex,city,country)
+VALUES(2,'James','Cameron','Francis','1954-08-16','M','Kapuskasing',6);
+INSERT INTO man (man_id,name,surname,birthday,sex,city,country)
+VALUES(3,'Woody','Allen','1935-12-01','M','New York',2);
+INSERT INTO man (man_id,name,surname,birthday,sex,city,country)
+VALUES(4,'Peter','Jackson','1961-10-31','M','Pukerua Bay',7);
+INSERT INTO man (man_id,name,surname,birthday,sex,city,country)
+VALUES(5,'Lyv','Tyler','1977-07-01','F','New York',2);
+INSERT INTO man (man_id,name,surname,birthday,sex,city,country)
+VALUES(6,'Kate','Winslet','1975-10-05','F','Reading',5);
+INSERT INTO man (man_id,name,surname,birthday,sex,city,country)
+VALUES(7,'Leonardo','DiCaprio','1974-11-11','M','Hollywood',2);
+INSERT INTO man (man_id,name,surname,second_name,birthday,sex,city,country)
+VALUES(8,'Arnold','Schwarzenegger','Alois','1947-07-30','M','Thal',8);
+INSERT INTO man (man_id,name,surname,birthday,sex,city,country)
+VALUES(9,'James','Horner','1953-08-14','M','Los Angeles',2);
+commit;
+INSERT INTO career VALUES (1,'director');
+INSERT INTO career VALUES (2,'writer');
+INSERT INTO career VALUES (3,'actor');
+INSERT INTO career VALUES (4,'producer');
+INSERT INTO career VALUES (5,'composer');
+INSERT INTO career VALUES (6,'operator');
+INSERT INTO career VALUES (7,'designer');
+
+INSERT INTO genre VALUES (1,'action');
+INSERT INTO genre VALUES (2,'biography');
+INSERT INTO genre VALUES (3,'western');
+INSERT INTO genre VALUES (4,'crime');
+INSERT INTO genre VALUES (5,'documentary');
+INSERT INTO genre VALUES (6,'drama');
+INSERT INTO genre VALUES (7,'comedy');
+INSERT INTO genre VALUES (8,'melodrama');
+INSERT INTO genre VALUES (9,'animation');
+INSERT INTO genre VALUES (10,'musical');
+INSERT INTO genre VALUES (11,'thriller');
+INSERT INTO genre VALUES (12,'horror');
+INSERT INTO genre VALUES (13,'fantasy');
+INSERT INTO genre VALUES (14,'adventure');
+INSERT INTO genre VALUES (15,'mystery');
+INSERT INTO genre VALUES (16,'romance');
+commit;
+INSERT INTO film (f_id,name,year_of_creation,duration,budget,prok)
+VALUES (1, 'The Lord of the Rings: The Fellowship of the Ring',2001,178,93000000,3);
+INSERT INTO film (f_id,name,year_of_creation,duration,budget,prok)
+VALUES (2, 'The Lord of the Rings: The Two Towers',2002,179,94000000,2);
+INSERT INTO film(f_id,name,year_of_creation,duration,budget,prok)
+VALUES (3, 'Titanic',1997,194,200000000,4);
+INSERT INTO film(f_id,name,year_of_creation,duration,budget,prok)
+VALUES (4, 'Avatar',2009,162,237000000,5);
+INSERT INTO film (f_id,name,year_of_creation,duration,budget,prok)
+VALUES (5,'The Terminator 2: Judgment Day',1991,137,102000000,1);
+INSERT INTO film (f_id,name,year_of_creation,duration,budget,prok)
+VALUES (6, 'Catch Me If You Can',2002,141,52000000,2);
+INSERT INTO film (f_id,name,year_of_creation,duration,budget,prok)
+VALUES (7, 'Manhattan',1979,96,39000000,4);
+commit;
+INSERT INTO soundtrack (sound_id,name,author,film,duration)
+VALUES (1,'My Heart Will Go ON',9,3,'05:08');
+INSERT INTO soundtrack (sound_id,name,author,film)
+VALUES (2,'You Dont Dream In Cryo',9,4);
+INSERT INTO soundtrack (sound_id,name,author,film,duration)
+VALUES (3,'Rose',9,3,'03:03');
+
+
+INSERT INTO company(com_id,name,year_of_foundation)
+VALUES(1,'Paramount Pictures',1912);
+INSERT INTO company(com_id,name,year_of_foundation)
+VALUES(2,'Warner Bros.Pictures',1918);
+INSERT INTO company(com_id,name,year_of_foundation)
+VALUES(3,'20th Century Fox',1935);
+INSERT INTO company(com_id,name,year_of_foundation)
+VALUES(4,'Universal Studios',1912);
+
+INSERT INTO prokat_company(film_id,pro_id)
+VALUES(1,1);
+INSERT INTO prokat_company(film_id,pro_id)
+VALUES(2,3);
+INSERT INTO prokat_company(film_id,pro_id)
+VALUES(4,5);
+INSERT INTO prokat_company(film_id,pro_id)
+VALUES(1,2);
+INSERT INTO prokat_company(film_id,pro_id)
+VALUES(4,3);
+INSERT INTO prokat_company(film_id,pro_id)
+VALUES(6,4);
+INSERT INTO ganorar(film_id,man_id,money_id)
+VALUES(1,4,1);
+INSERT INTO ganorar(film_id,man_id,money_id)
+VALUES(2,3,2);
+INSERT INTO ganorar(film_id,man_id,money_id)
+VALUES(4,2,5);
+INSERT INTO ganorar(film_id,man_id,money_id)
+VALUES(5,1,3);
+INSERT INTO ganorar(film_id,man_id,money_id)
+VALUES(3,5,4);
+
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(1,4,1);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(2,4,1);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(3,2,1);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(4,2,1);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(5,8,3);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(6,7,3);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(6,1,1);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(3,6,3);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(3,7,3);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(3,9,5);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(1,5,3);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(2,5,3);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(7,3,1);
+INSERT INTO part(film_id,man_id,role_id)
+VALUES(7,3,2);
+commit;
+INSERT INTO premium(film_id,man_id)
+VALUES (3,2);
+INSERT INTO premium(film_id,man_id)
+VALUES (3,9);
+INSERT INTO premium(film_id,man_id)
+VALUES (3,7);
+INSERT INTO premium(film_id,man_id)
+VALUES (5,2);
+INSERT INTO premium(film_id,man_id)
+VALUES (7,3);
+
+INSERT INTO made_in(film_id,country_id)
+VALUES (3,2);
+INSERT INTO made_in(film_id,country_id)
+VALUES (1,2);
+INSERT INTO made_in(film_id,country_id)
+VALUES (1,7);
+INSERT INTO made_in(film_id,country_id)
+VALUES (2,2);
+INSERT INTO made_in(film_id,country_id)
+VALUES (2,7);
+INSERT INTO made_in(film_id,country_id)
+VALUES (4,2);
+INSERT INTO made_in(film_id,country_id)
+VALUES (4,5);
+INSERT INTO made_in(film_id,country_id)
+VALUES (5,2);
+INSERT INTO made_in(film_id,country_id)
+VALUES (6,2);
+INSERT INTO made_in(film_id,country_id)
+VALUES (7,2);
+
+INSERT INTO production(film_id,com_id)	
+VALUES (3,3);
+INSERT INTO production(film_id,com_id)	
+VALUES (3,1);
+INSERT INTO production(film_id,com_id)	
+VALUES (4,3);
+
+INSERT INTO style(film_id,genre_id)
+VALUES(1,13);
+INSERT INTO style(film_id,genre_id)
+VALUES(1,14);
+INSERT INTO style(film_id,genre_id)
+VALUES(2,13);
+INSERT INTO style(film_id,genre_id)
+VALUES(2,1);
+INSERT INTO style(film_id,genre_id)
+VALUES(3,8);
+INSERT INTO style(film_id,genre_id)
+VALUES(3,6);
+INSERT INTO style(film_id,genre_id)
+VALUES(4,13);
+INSERT INTO style(film_id,genre_id)
+VALUES(5,1);
+INSERT INTO style(film_id,genre_id)
+VALUES(5,13);
+INSERT INTO style(film_id,genre_id)
+VALUES(6,6);
+INSERT INTO style(film_id,genre_id)
+VALUES(6,2);
+INSERT INTO style(film_id,genre_id)
+VALUES(6,4);
+commit;
